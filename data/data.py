@@ -3,6 +3,8 @@ import googlemaps
 from datetime import datetime
 import pickle
 
+
+
 #------------------------------------------------------------------------#
 #----------------------------------INFO----------------------------------#
 #------------------------------------------------------------------------#
@@ -11,6 +13,8 @@ import pickle
 This file is the combined data file containing all the carriers data in one single file.
 Also this file contains the already calculated R_k values from all different carriers.
 '''
+
+
 
 #------------------------------------------------------------------------#
 #------------------------------General Data------------------------------#
@@ -148,12 +152,12 @@ R_k = {
     carriers[3]: 973, #973
 }
 
-R_k_ggl = {
+'''R_k_ggl = {
     carriers[0]: 9050, 
     carriers[1]: 5020, 
     carriers[2]: 7500, 
     carriers[3]: 9730, 
-}
+}'''
 
 node_coordinates = {
     depots[0]:      (48.37669963965206, 10.847395818169758), #Phoenix Pharmahandel
@@ -263,8 +267,8 @@ cost_coordinates = load_file('cost_c.p')
 
 
 '''
-FIRST TIME PROGRAMM
-#Assigning all values the first time (when recalculating)
+#FIRST TIME PROGRAMM
+#Assigning all values the first time (when recalculating) GETTING LIVE TRAFFIC DATA AT THE MOMENT
 duration_coordinates = {(i,j): calculate_duration(origin=node_coordinates[i], destination=node_coordinates[j]) for i in nodes for j in nodes}
 distance_coordinates = {(i,j): calculate_distances(origin=node_coordinates[i], destination=node_coordinates[j]) for i in nodes for j in nodes}
 cost_coordinates = {(i,j): calculate_costs(duration=duration_coordinates[i,j],
@@ -278,7 +282,6 @@ cost_coordinates = {(i,j): calculate_costs(duration=duration_coordinates[i,j],
 def save_file(name, file):
     with open(name, 'wb') as fp: 
         pickle.dump(file, fp, protocol=pickle.HIGHEST_PROTOCOL)
-#save_file('duration_c.p', file=duration_coordinates)
-#save_file('distance_c.p', file=distance_coordinates)
-#save_file('cost_c.p', file=cost_coordinates)
-'''
+save_file('duration_c.p', file=duration_coordinates)
+save_file('distance_c.p', file=distance_coordinates)
+save_file('cost_c.p', file=cost_coordinates)'''
