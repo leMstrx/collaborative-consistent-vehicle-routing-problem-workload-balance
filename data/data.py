@@ -21,12 +21,11 @@ Also this file contains the already calculated R_k values from all different car
 #------------------------------------------------------------------------#
 
 p_amount = 4 #Amount of Periods
-carriers = ['Carrier_1', 'Carrier_2', 'Carrier_3', 'Carrier_4'] #List of carriers
+carriers = ['Carrier_1', 'Carrier_2', 'Carrier_3'] #List of carriers
 customers = ['Customer_1', 'Customer_2', 'Customer_3', 'Customer_4',
              'Customer_5', 'Customer_6', 'Customer_7', 'Customer_8',
-             'Customer_9', 'Customer_10', 'Customer_11', 'Customer_12',
-             'Customer_13'] #List of customers
-depots = ['Depot_1', 'Depot_2', 'Depot_3', 'Depot_4'] #List of depots
+             'Customer_9', 'Customer_10'] #List of customers
+depots = ['Depot_1', 'Depot_2', 'Depot_3'] #List of depots
 periods = [i for i in range (p_amount + 1) if i != 0] #List of periods
 nodes = depots + customers #List of all nodes (including depots and customers)
 
@@ -42,34 +41,30 @@ gmaps = googlemaps.Client(key=api_key)
 
 #Set of customers K with each carrier
 customers_k = {
-    carriers[0]:[customers[0], customers[4], customers[8], customers[11]],
-    carriers[1]:[customers[1], customers[5]],
-    carriers[2]:[customers[2], customers[6], customers[9]],
-    carriers[3]:[customers[3], customers[7], customers[10], customers[12]]
+    carriers[0]:[customers[0], customers[3], customers[6], customers[8]],
+    carriers[1]:[customers[1], customers[4], customers[9]],
+    carriers[2]:[customers[2], customers[5], customers[7]]
 }
 
 #Set of depots associated with each carrier K
 depots_k = {
     carriers[0]: depots[0],
     carriers[1]: depots[1],
-    carriers[2]: depots[2],
-    carriers[3]: depots[3],
+    carriers[2]: depots[2]
 }
 
 #Identical vehicles of carrier K
 vehicles_k = {
     carriers[0]: 3, 
     carriers[1]: 2,
-    carriers[2]: 3,
-    carriers[3]: 4,
+    carriers[2]: 3
 }
 
 #Maximum capacity of each carrier K 
 Q_max_k = {
     carriers[0]: 600, 
     carriers[1]: 500,
-    carriers[2]: 600,
-    carriers[3]: 700,
+    carriers[2]: 600
 }
 
 #Service time for a vehicle to complete service at customer I in period p
@@ -78,7 +73,6 @@ service_time = {
     depots[0]: {p: 0 for p in periods},
     depots[1]: {p: 0 for p in periods},
     depots[2]: {p: 0 for p in periods},
-    depots[3]: {p: 0 for p in periods},
     customers[0]:  {1: 10,  2: 45,  3: 25,  4: 15},
     customers[1]:  {1: 5,   2: 30,  3: 25,  4: 15}, 
     customers[2]:  {1: 20,  2: 10,  3: 45,  4: 10}, 
@@ -88,11 +82,7 @@ service_time = {
     customers[6]:  {1: 30,  2: 40,  3: 30,  4: 10}, 
     customers[7]:  {1: 25,  2: 45,  3: 45,  4: 15}, 
     customers[8]:  {1: 20,  2: 50,  3: 35,  4: 10}, 
-    customers[9]:  {1: 15,  2: 5,   3: 45,  4: 30},  
-    customers[10]: {1: 35,  2: 10,  3: 15,  4: 30}, 
-    customers[11]: {1: 40,  2: 10,  3: 70,  4: 5}, 
-    customers[12]: {1: 35,  2: 10,  3: 30,  4: 25}, 
-    #customers[13]: {1: 15,  2: 40,  3: 40,  4: 10}  
+    customers[9]:  {1: 15,  2: 5,   3: 45,  4: 30}
 }
 
 #Quantity to be delivered to Customer I in Period P
@@ -101,7 +91,6 @@ quantity_delivered = {
     depots[0]: {p: 0 for p in periods},
     depots[1]: {p: 0 for p in periods},
     depots[2]: {p: 0 for p in periods},
-    depots[3]: {p: 0 for p in periods},
     customers[0]:  {1: 20,  2: 90,  3: 50,  4: 30},
     customers[1]:  {1: 10,  2: 60,  3: 40,  4: 30}, 
     customers[2]:  {1: 45,  2: 25,  3: 90,  4: 20}, 
@@ -111,59 +100,49 @@ quantity_delivered = {
     customers[6]:  {1: 60,  2: 80,  3: 60,  4: 15}, 
     customers[7]:  {1: 55,  2: 90,  3: 90,  4: 25}, 
     customers[8]:  {1: 40,  2: 100, 3: 70,  4: 15}, 
-    customers[9]:  {1: 35,  2: 10,  3: 90,  4: 60},  
-    customers[10]: {1: 75,  2: 25,  3: 30,  4: 65}, 
-    customers[11]: {1: 85,  2: 15,  3: 140, 4: 10}, 
-    customers[12]: {1: 60,  2: 20,  3: 60,  4: 50}, 
-    #customers[13]: {1: 30,  2: 80,  3: 80,  4: 15} 
+    customers[9]:  {1: 35,  2: 10,  3: 90,  4: 60},
 }
 
 #Revenue from Customer I 
 revenue = {
-    customers[0]:   200,
-    customers[1]:   250,
-    customers[2]:   300, 
-    customers[3]:   400, 
-    customers[4]:   300, 
-    customers[5]:   350,  
-    customers[6]:   300, 
-    customers[7]:   250,   
-    customers[8]:   350, 
-    customers[9]:   300, 
-    customers[10]:  250,
-    customers[11]:  250,
-    customers[12]:  150,
-    #customers[13]:  200
+    customers[0]:   40,
+    customers[1]:   50,
+    customers[2]:   60, 
+    customers[3]:   35, 
+    customers[4]:   70, 
+    customers[5]:   80,  
+    customers[6]:   70, 
+    customers[7]:   45,   
+    customers[8]:   85, 
+    customers[9]:   70
 }
 
 #Maximum allowed quantity to reduce customer number (alpha)
 alpha = {
-    carriers[0]: 1,
+    carriers[0]: 2,
     carriers[1]: 1,
-    carriers[2]: 1,
-    carriers[3]: 2
+    carriers[2]: 1
 }
 
 #Profit of a carrier if it doesnt participate in a collaboration #NOT FINAL
-R_k = {
-    carriers[0]: 918, #918 matplot
-    carriers[1]: 502, #502
-    carriers[2]: 750, #750
-    carriers[3]: 973, #973
+R_k_simple = {
+    carriers[0]: 181, #918 matplot
+    carriers[1]: 141, #502
+    carriers[2]: 141, #750
+    #carriers[3]: 999, #973
 }
 
-'''R_k_ggl = {
-    carriers[0]: 9050, 
-    carriers[1]: 5020, 
-    carriers[2]: 7500, 
-    carriers[3]: 9730, 
-}'''
+R_k_live = {
+    carriers[0]: 175.9, 
+    carriers[1]: 130.81, 
+    carriers[2]: 134.88, 
+    #carriers[3]: 969, 
+}
 
-node_coordinates = {
+node_coordinates_1 = {
     depots[0]:      (48.37669963965206, 10.847395818169758), #Phoenix Pharmahandel
     depots[1]:      (48.366202776488905, 10.912264207571434), #Okta Pharma
-    depots[2]:      (48.38377128068613, 10.889671856707823), #ERFUNDEN: Hyper Pharma
-    depots[3]:      (48.38576430277988, 10.847746195933514), #Betapharm Arzneimittel
+    depots[2]:      (48.38576430277988, 10.847746195933514), #Betapharm Arzneimittel
     customers[0]:   (48.372238632480766, 10.862015827111975), #Luther King Apotheke
     customers[1]:   (48.36883112692946, 10.893726914208708), #Grottenau Apotheke
     customers[2]:   (48.36488012421214, 10.89395187568196), #Markus Apotheke
@@ -173,11 +152,25 @@ node_coordinates = {
     customers[6]:   (48.36988505176495, 10.904548318918328), #Pelikan Apotheke
     customers[7]:   (48.36118399628752, 10.911567416457691), #Gudjons Apotheke
     customers[8]:   (48.360215616806194, 10.898047745217333), #Bismarck Apotheke
-    customers[9]:   (48.367411139803906, 10.899375411882197), #Stern Apotheke
-    customers[10]:  (48.37511817959376, 10.895619273203693), #Frauentor Apotheke
-    customers[11]:  (48.3810751510169, 10.916787970920002), #Apotheke am Schlössle
-    customers[12]:  (48.3625355405014, 10.868040728280596), #Linden Apotheke
-    #customers[13]:  (5, 8)
+    customers[9]:   (48.36756930024934, 10.848667728295393) #St. Antonius Apotheke
+}
+
+
+#Neue Koordinaten zum testen 
+node_coordinates = {
+    depots[0]:      (48.381349031151075, 10.875335320909437),   #Betapharm (von den Koordinaten her Oberhausen Bhf. Apotheke)
+    depots[1]:      (48.366202776488905, 10.912264207571434),   #Okta Pharma
+    depots[2]:      (48.37664980094921, 10.84763538182512),     #Phoenix
+    customers[0]:   (48.372725678347464, 10.851883823725666),   #Luther King Apotheke
+    customers[1]:   (48.362680437831756, 10.868071860832345),   #Linden Apotheke
+    customers[2]:   (48.38064954541611, 10.853754414457114),    #Stefan Apotheke Manhart
+    customers[3]:   (48.3747990060179, 10.903667415418784),     #Apotheke am Vincentium
+    customers[4]:   (48.386255681437625, 10.847253141222609),   #Apotheke am Oberhausen Bhf (eigentlich Betapharm Koords)
+    customers[5]:   (48.36914859303573, 10.888223114642567),    #Dr. Kaus Apotheke am Diako
+    customers[6]:   (48.36988505176495, 10.904548318918328),    #Pelikan Apotheke
+    customers[7]:   (48.37849049605951, 10.91394362149913),     #Bavaria Apotheke
+    customers[8]:   (48.36887051624558, 10.893702098585257),    #Grottenau Apotheke
+    customers[9]:   (48.367820748905615, 10.84845144855721)     #St. Antonius Apotheke
 }
 
 
@@ -190,7 +183,7 @@ node_coordinates = {
 Q_max = max(Q_max_k.values())
 
 #Maximum Duration for each Vehicle
-T_max = 250
+T_max = 450
 
 #Maximum time units difference
 delta = 70
@@ -201,10 +194,10 @@ delta = 70
 #---------------------Calculate Matplotlib Values------------------------#
 #------------------------------------------------------------------------#
 
-duration_points = {(i,j): np.hypot(node_coordinates[i][0] - node_coordinates[j][0], node_coordinates[i][1] - node_coordinates[j][1]) * 100
-                   for i in nodes for j in nodes}
-cost_points = {(i,j): duration_points[i,j] * 0.8
-               for i in nodes for j in nodes}
+duration_plt = {(i,j): np.hypot(node_coordinates[i][0] - node_coordinates[j][0], node_coordinates[i][1] - node_coordinates[j][1]) * 100 
+                for i in nodes for j in nodes}
+cost_plt = {(i,j): duration_plt[i,j] * 0.8 
+            for i in nodes for j in nodes}
 
 #Testing:
 #print("Duration Points: \n", duration_points)
@@ -261,13 +254,13 @@ def load_file(file):
     with open(file, 'rb') as fp:
         data = pickle.load(fp)
     return data
-duration_coordinates = load_file('duration_c.p')
-distance_coordinates = load_file('distance_c.p')
-cost_coordinates = load_file('cost_c.p')
+duration_coordinates = load_file('data/duration_c.p')
+distance_coordinates = load_file('data/distance_c.p')
+cost_coordinates = load_file('data/cost_c.p')
 
 
 '''
-#FIRST TIME PROGRAMM
+#FIRST TIME EXECUTION
 #Assigning all values the first time (when recalculating) GETTING LIVE TRAFFIC DATA AT THE MOMENT
 duration_coordinates = {(i,j): calculate_duration(origin=node_coordinates[i], destination=node_coordinates[j]) for i in nodes for j in nodes}
 distance_coordinates = {(i,j): calculate_distances(origin=node_coordinates[i], destination=node_coordinates[j]) for i in nodes for j in nodes}

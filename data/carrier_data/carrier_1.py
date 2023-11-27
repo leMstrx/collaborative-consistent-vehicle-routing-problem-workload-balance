@@ -22,7 +22,7 @@ This file is needed to calculate R_k for carrier_1.
 
 p_amount = 4 #Amount of Periods
 carriers = ['Carrier_1']
-customers = ['Customer_1', 'Customer_5', 'Customer_9', 'Customer_12']
+customers = ['Customer_1', 'Customer_4', 'Customer_7', 'Customer_9']
 depots = ['Depot_1']
 periods = [i for i in range(p_amount + 1) if i != 0]
 nodes = depots + customers
@@ -56,36 +56,36 @@ Q_max_k = {
 service_time = {
     depots[0]: {p: 0 for p in periods},
     customers[0]: {1: 10, 2: 45, 3: 25, 4: 15},
-    customers[1]: {1: 45, 2: 20, 3: 20, 4: 15},
-    customers[2]: {1: 20, 2: 50, 3: 35, 4: 10},
-    customers[3]: {1: 40, 2: 10, 3: 70, 4: 5}
+    customers[1]: {1: 35, 2: 15, 3: 40, 4: 10},
+    customers[2]: {1: 30, 2: 40, 3: 30, 4: 10},
+    customers[3]: {1: 20, 2: 50, 3: 35, 4: 10}
 }
 
 quantity_delivered = {
     depots[0]: {p: 0 for p in periods},
     customers[0]: {1: 20, 2: 90, 3: 50, 4: 30},
-    customers[1]: {1: 90, 2: 40, 3: 40, 4: 25},
-    customers[2]: {1: 40, 2: 100, 3: 70, 4: 15},
-    customers[3]: {1: 85, 2: 15, 3: 140, 4: 10}
+    customers[1]: {1: 70,  2: 35,  3: 80,  4: 20},
+    customers[2]: {1: 60,  2: 80,  3: 60,  4: 15},
+    customers[3]: {1: 40,  2: 100, 3: 70,  4: 15}
 }
 
 revenue = {
-    customers[0]: 200,
-    customers[1]: 300,
-    customers[2]: 350,
-    customers[3]: 250
+    customers[0]: 40,
+    customers[1]: 35,
+    customers[2]: 70,
+    customers[3]: 80
 }
 
 alpha = {
-    carriers[0]: 1
+    carriers[0]: 2
 }
 
 node_coordinates = {
-    depots[0]:      (48.37669963965206, 10.847395818169758), #Phoenix Pharmahandel
-    customers[0]:   (48.372238632480766, 10.862015827111975), #Luther King Apotheke
-    customers[1]:   (48.37894075371622, 10.88154579693216), #Apotheke an der Wertachbrücke
-    customers[2]:   (48.360215616806194, 10.898047745217333), #Bismarck Apotheke
-    customers[3]:  (48.3810751510169, 10.916787970920002), #Apotheke am Schlössle
+    depots[0]:      (48.381349031151075, 10.875335320909437),   #Betapharm (von den Koordinaten her Oberhausen Bhf. Apotheke)
+    customers[0]:   (48.372725678347464, 10.851883823725666),   #Luther King Apotheke
+    customers[1]:   (48.37717621931016, 10.838580109918029),    #Apotheke Via Claudia
+    customers[2]:   (48.36988505176495, 10.904548318918328),    #Pelikan Apotheke
+    customers[3]:   (48.36887051624558, 10.893702098585257),    #Grottenau Apotheke
     #customers[13]:  (5, 8)
 }
 
@@ -99,10 +99,11 @@ node_coordinates = {
 Q_max = max(Q_max_k.values())
 
 #Maximum Duration for each Vehicle
-T_max = 250
+T_max = 170
 
 #Maximum time units difference
-delta = 70
+delta = 7
+
 
 
 
@@ -110,9 +111,9 @@ delta = 70
 #---------------------Calculate Matplotlib Values------------------------#
 #------------------------------------------------------------------------#
 
-duration_points = {(i,j): np.hypot(node_coordinates[i][0] - node_coordinates[j][0], node_coordinates[i][1] - node_coordinates[j][1]) * 100
+duration_plt = {(i,j): np.hypot(node_coordinates[i][0] - node_coordinates[j][0], node_coordinates[i][1] - node_coordinates[j][1]) * 100
                    for i in nodes for j in nodes}
-cost_points = {(i,j): duration_points[i,j] * 0.8
+cost_plt = {(i,j): duration_plt[i,j] * 0.8
                for i in nodes for j in nodes}
 
 
@@ -162,19 +163,25 @@ def calculate_costs(duration, distance, worker_payment_rate, fuel_price_per_lite
 
     return total_cost
 
-'''NORMAL PROGRAM
-#Reading values to improve performance
+#Functions to load and save
 def load_file(file):
     with open(file, 'rb') as fp:
         data = pickle.load(fp)
     return data
-duration_coordinates = load_file('carrier_1_duration_c.p')
-distance_coordinates = load_file('carrier_1_distance_c.p')
-cost_coordinates = load_file('carrier_1_cost_c.p')
+
+def save_file(name, file):
+    with open(name, 'wb') as fp: 
+        pickle.dump(file, fp, protocol=pickle.HIGHEST_PROTOCOL)
+
+#--------------------Normal Execution----------------------------#
+#Reading values to improve performance
+duration_coordinates = load_file('data/carrier_data/carrier_1_duration_c.p')
+distance_coordinates = load_file('data/carrier_data/carrier_1_distance_c.p')
+cost_coordinates = load_file('data/carrier_data/carrier_1_cost_c.p')
+
+
 '''
-
-
-#FIRST TIME PROGRAMM
+#-------------------First Time Execution-------------------------#
 #Assigning all values the first time (when recalculating)
 duration_coordinates = {(i,j): calculate_duration(origin=node_coordinates[i], destination=node_coordinates[j]) for i in nodes for j in nodes}
 distance_coordinates = {(i,j): calculate_distances(origin=node_coordinates[i], destination=node_coordinates[j]) for i in nodes for j in nodes}
@@ -186,9 +193,7 @@ cost_coordinates = {(i,j): calculate_costs(duration=duration_coordinates[i,j],
                     for i in nodes for j in nodes}
 
 #Saving values in csv files to improve performance
-def save_file(name, file):
-    with open(name, 'wb') as fp: 
-        pickle.dump(file, fp, protocol=pickle.HIGHEST_PROTOCOL)
 save_file('carrier_1_duration_c.p', file=duration_coordinates)
 save_file('carrier_1_distance_c.p', file=distance_coordinates)
 save_file('carrier_1_cost_c.p', file=cost_coordinates)
+'''
