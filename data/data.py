@@ -277,4 +277,17 @@ def save_file(name, file):
         pickle.dump(file, fp, protocol=pickle.HIGHEST_PROTOCOL)
 save_file('duration_c.p', file=duration_coordinates)
 save_file('distance_c.p', file=distance_coordinates)
-save_file('cost_c.p', file=cost_coordinates)'''
+save_file('cost_c.p', file=cost_coordinates)
+'''
+'''
+#Testing
+print("\n\n\n\nKosten Daten (live):")
+print(cost_coordinates)
+print("\n\n\n\nZeit Daten (live):")
+print(duration_coordinates)
+print("\n\n\n\nDistanz Daten (live):")
+print(distance_coordinates)
+print("\n\n\n\nKosten Daten (plot):")
+print(cost_plt)
+print("\n\n\n\n Zeit Daten (plot):")
+print(duration_plt)'''

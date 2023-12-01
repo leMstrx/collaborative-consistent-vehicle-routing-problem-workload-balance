@@ -33,14 +33,14 @@ gmaps = googlemaps.Client(key=api_key)
 #------------------------------------------------------------------------#
 
 #Use simplified data
-duration = duration_plt
+'''duration = duration_plt
 cost = cost_plt
-R_k = R_k_simple
+R_k = R_k_simple'''
 
 #Use live data
-#duration = duration_coordinates 
-#cost = cost_coordinates
-#R_k = R_k_live
+duration = duration_coordinates 
+cost = cost_coordinates
+R_k = R_k_live
 
 
 
@@ -254,8 +254,8 @@ def plot_opt_routes():
 
 # Define colors for each carrier
 carrier_colors = {
-    "Carrier_1": 'red',
-    "Carrier_2": 'blue',
+    "Carrier_1": 'blue',
+    "Carrier_2": 'red',
     "Carrier_3": 'green',
 }
 
@@ -270,7 +270,11 @@ def get_detailed_routes():
             if X[i, j, carrier, 1].x > 0.9:
                 route_coords.append(node_coordinates[i])
 
-        # Split waypoints into chunks of 25
+        #Append the depot to the route
+        depot_coord = node_coordinates[depots_k[carrier]]
+        route_coords.append(depot_coord)
+
+        # Split waypoints into chunks of 25 (because of API Limitations)
         waypoint_chunks = [route_coords[i:i + 25] for i in range(0, len(route_coords), 25)]
 
         # Initialize the full route
