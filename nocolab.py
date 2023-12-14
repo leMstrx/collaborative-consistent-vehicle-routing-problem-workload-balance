@@ -14,15 +14,20 @@ This file is for calculating the nocollaboration profits of each carrier.
 For this I have created several different data files - only including their respective data.
 '''
 
+#------------------------------------------------------------------------#
+#----------------------------Specific Imports----------------------------#
+#------------------------------------------------------------------------#
+
+#from data.data import * #Use when plotting everything without collabs
 
 
 #------------------------------------------------------------------------#
 #----------------------------Specific Imports----------------------------#
 #------------------------------------------------------------------------#
 
-from data.carrier_data.carrier_1 import *
+#from data.carrier_data.carrier_1 import *
 #from data.carrier_data.carrier_2 import *
-#from data.carrier_data.carrier_3 import *
+from data.carrier_data.carrier_3 import *
 
 
 
@@ -150,6 +155,12 @@ model.optimize()
 # Extracting and printing the variables
 print("Objective Value: ", str(round(model.ObjVal, 2)))
 
+#-----------------------Printing the Variables---------------------------#
+
+print("Objective Value: " ,str(round(model.ObjVal, 2)))
+for v in model.getVars():
+    if v.x > 0.9: 
+        print(str(v.VarName)+"="+str(v.x))
 
 
 #------------------------------------------------------------------------#
@@ -157,19 +168,26 @@ print("Objective Value: ", str(round(model.ObjVal, 2)))
 #------------------------------------------------------------------------#
 
 
+def plot_single_carrier():
+    # Plotting the nodes
+    plt.figure()
+    plt.title("Nodes - Depot and Customers")
 
-# Plotting the nodes
-plt.figure()
-plt.title("Nodes - Depot and Customers")
+    # Plotting depot
+    plt.scatter(node_coordinates[depots_k[carriers[0]]][1], node_coordinates[depots_k[carriers[0]]][0], marker='X', color='blue', label='Depot')
 
-# Plotting depot
-plt.scatter(node_coordinates[depots_k[carriers[0]]][1], node_coordinates[depots_k[carriers[0]]][0], marker='X', color='blue', label='Depot')
+    # Plotting customers
+    for i in customers:
+        plt.scatter(node_coordinates[i][1], node_coordinates[i][0], marker='o', label=i)
 
-# Plotting customers
-for i in customers:
-    plt.scatter(node_coordinates[i][1], node_coordinates[i][0], marker='o', label=i)
+    plt.legend()
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.show()
 
-plt.legend()
-plt.xlabel('Longitude')
-plt.ylabel('Latitude')
-plt.show()
+plot_single_carrier()
+
+
+
+
+

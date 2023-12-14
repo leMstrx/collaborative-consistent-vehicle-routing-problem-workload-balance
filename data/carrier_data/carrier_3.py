@@ -21,9 +21,9 @@ This file is needed to calculate R_k for carrier_3.
 #------------------------------------------------------------------------#
 
 p_amount = 4 #Amount of Periods
-carriers = ['Carrier_3']
-customers = ['Customer_3', 'Customer_6', 'Customer_8']
-depots = ['Depot_3']
+carriers = ['Anbieter 3']
+customers = ['Kunde 3', 'Kunde 6', 'Kunde 8']
+depots = ['Depot 3']
 periods = [i for i in range(p_amount + 1) if i != 0]
 nodes = depots + customers
 

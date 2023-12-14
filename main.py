@@ -33,11 +33,11 @@ gmaps = googlemaps.Client(key=api_key)
 #------------------------------------------------------------------------#
 
 #Use simplified data
-'''duration = duration_plt
-cost = cost_plt
-R_k = R_k_simple'''
+#duration = duration_plt
+#cost = cost_plt
+#R_k = R_k_simple
 
-#Use live data
+#Use real data
 duration = duration_coordinates 
 cost = cost_coordinates
 R_k = R_k_live
@@ -144,7 +144,7 @@ model.addConstrs(T[j,p2] - T[j,p1] <= delta
                  for j in customers for p1 in periods if quantity_delivered[j][p1] > 0 for p2 in periods if quantity_delivered[j][p2] > 0)
 
 #--17--#
-model.addConstrs(quicksum(revenue[j]*Y[j,k] for j in customers) - quicksum(cost_coordinates[i,j] * X[i,j,k,p] for p in periods for i in nodes for j in customers) >= R_k[k]
+model.addConstrs(quicksum(revenue[j]*Y[j,k] for j in customers) - quicksum(cost[i,j] * X[i,j,k,p] for p in periods for i in nodes for j in customers) >= R_k[k]
                  for k in carriers)
 
 #--18--#
@@ -167,6 +167,7 @@ model.addConstrs(quicksum(quantity_delivered[i][p]*Y[i,k] for i in customers) <=
 
 
 '''
+Potenziell noch lauslöschen die Valid Inequalities die eh nicht klappne
 #--22--#
 #model.addConstrs(quicksum)
 
@@ -184,15 +185,14 @@ model.addConstrs(quicksum(X[i,j,k,p] for i in nodes for j in nodes) <= quicksum(
 
 model.optimize()
 
-#----------------------------Save the model------------------------------#
+#---------------------Printing the Carrier Profits-----------------------#
 
-model.write("current_solution.sol")
+for k in carriers:
+    # Berechnung des Gewinns für den aktuellen Carrier
+    carrier_profit = sum(revenue[j] * Y[j, k].x for j in customers) - sum(cost[i, j] * X[i, j, k, p].x for p in periods for i in nodes for j in customers)
 
-#----------------------------Read the model------------------------------#
-
-#model.update()
-#model.read("current_solution.sol")
-#model.optimize()
+    # Ausgabe des Gewinns für den aktuellen Carrier
+    print(f"Gewinn für {k}: {carrier_profit:.2f}")
 
 #-----------------------Printing the Variables---------------------------#
 
@@ -223,9 +223,13 @@ def plot_opt_routes():
     for node, coords in node_coordinates.items():
         if node in depots:
             plt.scatter(coords[1], coords[0], label=node, marker="D", s=100, color=depots_colors[node], alpha=0.8)
+            plt.annotate(f'{node}\n(T: 0)', (coords[1], coords[0]), textcoords="offset points", xytext=(6, 6), ha='right', fontsize=9, color='black')
         elif node in customers:
             k = [k for k, v in customers_k.items() if node in v][0]  # find the carrier for the customers
             plt.scatter(coords[1], coords[0], label=node, marker="o", s=80, color=customers_colors[k], alpha=0.8)
+            #Annotating for better visibility
+            arrival_time = T[node, 1].x  # Adjust the period as needed
+            plt.annotate(f'{node}\n(T: {arrival_time:.1f})', (coords[1], coords[0]), textcoords="offset points", xytext=(6, 6), ha='right', fontsize=9, color='black')
 
     # Plot the routes
     for k in carriers:
@@ -243,10 +247,10 @@ def plot_opt_routes():
                     plt.plot(route_x, route_y, color=customers_colors[k], linewidth=2.2, linestyle='-', alpha=0.7)
 
     # Set labels and legend
-    plt.title("Optimized Routes for Carriers")
-    plt.xlabel("Longitude")
-    plt.ylabel("Latitude")
-    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Nodes", title_fontsize='14', fontsize='12')  # Place legend outside the plot
+    plt.title("Optimierte Routen der Anbieter durch Kollaborationen")
+    plt.xlabel("Längengrad")
+    plt.ylabel("Breitengrad")
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Nodes", title_fontsize='12', fontsize='10')  # Place legend outside the plot
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.show()
 
@@ -254,9 +258,9 @@ def plot_opt_routes():
 
 # Define colors for each carrier
 carrier_colors = {
-    "Carrier_1": 'blue',
-    "Carrier_2": 'red',
-    "Carrier_3": 'green',
+    "Anbieter 1": 'blue',
+    "Anbieter 2": 'red',
+    "Anbieter 3": 'green',
 }
 
 def get_detailed_routes():
@@ -270,7 +274,7 @@ def get_detailed_routes():
             if X[i, j, carrier, 1].x > 0.9:
                 route_coords.append(node_coordinates[i])
 
-        #Append the depot to the route
+        # Append the depot to the route
         depot_coord = node_coordinates[depots_k[carrier]]
         route_coords.append(depot_coord)
 
@@ -282,12 +286,13 @@ def get_detailed_routes():
 
         # Request detailed route for each chunk
         for waypoints in waypoint_chunks:
-            # Request detailed route from Google Maps API
+            # Request detailed route from Google Maps API with adjustments
             directions_result = gmaps.directions(
                 waypoints[0],
                 waypoints[-1],
                 waypoints=waypoints[1:-1],
-                mode="driving"
+                mode="driving",
+                avoid="ferries"
             )
 
             # Extract detailed route coordinates
@@ -310,6 +315,16 @@ def create_map_with_markers_and_routes():
             icon=folium.Icon(color=carrier_colors[carrier], icon='glyphicon-home')
         ).add_to(map_routes)
 
+        # Add label next to the marker
+        folium.map.Marker(
+            [node_coordinates[depot][0], node_coordinates[depot][1]],
+            icon=folium.DivIcon(
+                icon_size=(150, 36),
+                icon_anchor=(7, 15),
+                html=f'<div style="font-size: 10pt; color : {carrier_colors[carrier]};">{depot}</div>'
+            )
+        ).add_to(map_routes)
+
     # Add markers for customers with carrier-specific colors
     for carrier, customer_list in customers_k.items():
         for customer in customer_list:
@@ -319,17 +334,40 @@ def create_map_with_markers_and_routes():
                 icon=folium.Icon(color=carrier_colors[carrier], icon='glyphicon-user', prefix='glyphicon')
             ).add_to(map_routes)
 
+            # Add label next to the marker
+            folium.map.Marker(
+                [node_coordinates[customer][0], node_coordinates[customer][1]],
+                icon=folium.DivIcon(
+                    icon_size=(150, 36),
+                    icon_anchor=(7, 15),
+                    html=f'<div style="font-size: 10pt; color : {carrier_colors[carrier]};">{customer}</div>'
+                )
+            ).add_to(map_routes)
+
     # Add detailed routes to the map
     detailed_routes = get_detailed_routes()
     for carrier, route in zip(carriers, detailed_routes):
         folium.PolyLine(route, color=carrier_colors[carrier], weight=5, opacity=1).add_to(map_routes)
+
+    # Create a legend (workaround using HTML)
+    legend_html = """
+    <div style="position: fixed; bottom: 50px; left: 50px; z-index:1000; font-size: 12pt; background-color: white; padding: 10px; border: 1px solid grey;">
+        <p><strong>Legend</strong></p>
+        <p><i class="glyphicon glyphicon-home" style="color: blue;"></i> Anbieter 1</p>
+        <p><i class="glyphicon glyphicon-home" style="color: red;"></i> Anbieter 2</p>
+        <p><i class="glyphicon glyphicon-home" style="color: green;"></i> Anbieter 3</p>
+        <!-- Add more entries for each carrier -->
+    </div>
+    """
+
+    map_routes.get_root().html.add_child(folium.Element(legend_html))
 
     map_routes.save('map_with_markers_and_routes.html')
 
 #-----------------------Executing the Visualization----------------------#
 
 #Google Maps:
-create_map_with_markers_and_routes()
+#create_map_with_markers_and_routes()
 
 #Matplotlib:
 plot_opt_routes()

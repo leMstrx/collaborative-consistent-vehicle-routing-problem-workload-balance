@@ -21,11 +21,11 @@ Also this file contains the already calculated R_k values from all different car
 #------------------------------------------------------------------------#
 
 p_amount = 4 #Amount of Periods
-carriers = ['Carrier_1', 'Carrier_2', 'Carrier_3'] #List of carriers
-customers = ['Customer_1', 'Customer_2', 'Customer_3', 'Customer_4',
-             'Customer_5', 'Customer_6', 'Customer_7', 'Customer_8',
-             'Customer_9', 'Customer_10'] #List of customers
-depots = ['Depot_1', 'Depot_2', 'Depot_3'] #List of depots
+carriers = ['Anbieter 1', 'Anbieter 2', 'Anbieter 3'] #List of carriers
+customers = ['Kunde 1', 'Kunde 2', 'Kunde 3', 'Kunde 4',
+             'Kunde 5', 'Kunde 6', 'Kunde 7', 'Kunde 8',
+             'Kunde 9', 'Kunde 10'] #List of customers
+depots = ['Depot 1', 'Depot 2', 'Depot 3'] #List of depots
 periods = [i for i in range (p_amount + 1) if i != 0] #List of periods
 nodes = depots + customers #List of all nodes (including depots and customers)
 
@@ -124,37 +124,19 @@ alpha = {
     carriers[2]: 1
 }
 
-#Profit of a carrier if it doesnt participate in a collaboration #NOT FINAL
+#Profit of a carrier if it doesnt participate in a collaboration GESAMT = 464.35
 R_k_simple = {
-    carriers[0]: 181, #918 matplot
-    carriers[1]: 141, #502
-    carriers[2]: 141, #750
-    #carriers[3]: 999, #973
+    carriers[0]: 181.29, 
+    carriers[1]: 141.64, 
+    carriers[2]: 141.42 
 }
 
+#Profit of a carrier if it doesnt participate in a collaboration LIVE VALUES - GESAMT = 381.17
 R_k_live = {
-    carriers[0]: 175.9, 
-    carriers[1]: 130.81, 
-    carriers[2]: 134.88, 
-    #carriers[3]: 969, 
+    carriers[0]: 159.17, #175.9, 
+    carriers[1]: 105.29, #130.81, 
+    carriers[2]: 116.71  #134.88, 
 }
-
-node_coordinates_1 = {
-    depots[0]:      (48.37669963965206, 10.847395818169758), #Phoenix Pharmahandel
-    depots[1]:      (48.366202776488905, 10.912264207571434), #Okta Pharma
-    depots[2]:      (48.38576430277988, 10.847746195933514), #Betapharm Arzneimittel
-    customers[0]:   (48.372238632480766, 10.862015827111975), #Luther King Apotheke
-    customers[1]:   (48.36883112692946, 10.893726914208708), #Grottenau Apotheke
-    customers[2]:   (48.36488012421214, 10.89395187568196), #Markus Apotheke
-    customers[3]:   (48.37717621931016, 10.838580109918029), #Apotheke Via Claudia
-    customers[4]:   (48.37894075371622, 10.88154579693216), #Apotheke an der Wertachbrücke
-    customers[5]:   (48.36914859303573, 10.888223114642567), #Dr. Kaus Apotheke am Diako
-    customers[6]:   (48.36988505176495, 10.904548318918328), #Pelikan Apotheke
-    customers[7]:   (48.36118399628752, 10.911567416457691), #Gudjons Apotheke
-    customers[8]:   (48.360215616806194, 10.898047745217333), #Bismarck Apotheke
-    customers[9]:   (48.36756930024934, 10.848667728295393) #St. Antonius Apotheke
-}
-
 
 #Neue Koordinaten zum testen 
 node_coordinates = {
@@ -258,7 +240,6 @@ duration_coordinates = load_file('data/duration_c.p')
 distance_coordinates = load_file('data/distance_c.p')
 cost_coordinates = load_file('data/cost_c.p')
 
-
 '''
 #FIRST TIME EXECUTION
 #Assigning all values the first time (when recalculating) GETTING LIVE TRAFFIC DATA AT THE MOMENT
@@ -279,15 +260,4 @@ save_file('duration_c.p', file=duration_coordinates)
 save_file('distance_c.p', file=distance_coordinates)
 save_file('cost_c.p', file=cost_coordinates)
 '''
-'''
-#Testing
-print("\n\n\n\nKosten Daten (live):")
-print(cost_coordinates)
-print("\n\n\n\nZeit Daten (live):")
-print(duration_coordinates)
-print("\n\n\n\nDistanz Daten (live):")
-print(distance_coordinates)
-print("\n\n\n\nKosten Daten (plot):")
-print(cost_plt)
-print("\n\n\n\n Zeit Daten (plot):")
-print(duration_plt)'''
+
